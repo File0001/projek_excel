@@ -1,0 +1,21 @@
+src/__pycache__/
+tests/__pycache__/
+__pycache__/
+build/
+dist/
+output/
+.venv/
+*.spec
+.clineignore
+.clinerules
+.cline/
+installer/ 
+installer.iss
+README-INSTALLER.md
+Transaksi diterima!.eml
+build-installer.bat
+src/.env.example
+Transaksi diterima!.json
+.env
+*.env
+src/.env
