@@ -168,13 +168,21 @@ class QueueManager:
         """Get count of tasks currently being processed."""
         return len([t for t in self.tasks.values() if t.status == "processing"])
 
-    def update_task_config(self, task_id: str, config: Dict[str, Any]) -> bool:
+    def update_task_config(
+        self,
+        task_id: str,
+        config: Dict[str, Any],
+        reactivate: bool = True,
+    ) -> bool:
         """Update configuration for a specific task.
-        
+
         Args:
             task_id: The task ID to update
             config: Dictionary with keys: selectedSheets, paperSize, orientation, scaling, outputPath
-            
+            reactivate: When True (default), a task that already finished (or
+                failed) is reactivated back to 'pending' after its config changes,
+                so it can be converted again without re-uploading the file.
+
         Returns:
             True if task was found and updated, False otherwise
         """
@@ -190,6 +198,17 @@ class QueueManager:
                 task.scaling = config["scaling"]
             if "outputPath" in config:
                 task.outputPath = config["outputPath"]
+
+            # Reuse-after-conversion: when a finished (or failed) task has its
+            # configuration changed, reactivate it so it becomes convertible
+            # again without re-uploading the file.
+            if reactivate and task.status in ("completed", "error"):
+                task.status = "pending"
+                task.progress = 0
+                appLogger.info(
+                    f"Task {task_id} reactivated to pending after config change"
+                )
+
             self._save_to_disk()
             appLogger.info(f"Updated config for task {task_id}")
             return True

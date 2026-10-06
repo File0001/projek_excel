@@ -827,6 +827,16 @@ class MainWindow(ctk.CTkFrame):
             self.queueManager.update_task_config(task.id, self._gatherConfigFromUi(task))
             # Refresh hint text on the queue row without full rebuild flicker
             self._updateRowHint(task.id)
+            # Refresh the right-side status badge: a finished task that was just
+            # reconfigured is reactivated to "Menunggu" so it can be converted
+            # again without re-uploading the file.
+            if task.id == self.selectedTaskId:
+                status = statusConfig.get(task.status, statusConfig["pending"])
+                self.selectedFileStatusLabel.configure(
+                    text=f"  {status['label']}  ",
+                    text_color=status["text"],
+                    fg_color=status["fg"],
+                )
         except Exception as saveErr:
             appLogger.warning(f"Gagal auto-save config: {saveErr}")
 
