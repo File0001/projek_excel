@@ -10,7 +10,9 @@ import customtkinter as ctk
 from src.config import PaperSizeEnum, PageOrientationEnum, PageScalingEnum, OutputModeEnum
 from src.core.excel_inspector import SheetMetadata
 from src.ui.main_window import MainWindow
-from src.ui.components import FileSelector, SheetList, SettingsPanel, ActionBar
+from src.ui.components import SheetList, SettingsPanel
+from src.ui.components.file_selector import FileSelector
+from src.ui.components.action_bar import ActionBar
 
 
 
@@ -71,6 +73,17 @@ def testUiComponents() -> None:
         updated = panel.getSettings()
         assert updated["paperSize"] == PaperSizeEnum.F4
         assert updated["orientation"] == PageOrientationEnum.LANDSCAPE
+
+        # Test setValues (used when switching files in the unified view)
+        panel.setValues(
+            paperSize=PaperSizeEnum.A4.value,
+            orientation=PageOrientationEnum.PORTRAIT.value,
+            scaling=PageScalingEnum.FIT_SHEET.value,
+        )
+        restored = panel.getSettings()
+        assert restored["paperSize"] == PaperSizeEnum.A4, "setValues paperSize failed"
+        assert restored["orientation"] == PageOrientationEnum.PORTRAIT, "setValues orientation failed"
+        assert restored["scaling"] == PageScalingEnum.FIT_SHEET, "setValues scaling failed"
         print("[PASS] SettingsPanel verified.")
 
         # 4. Test ActionBar
@@ -88,18 +101,22 @@ def testUiComponents() -> None:
 
     # 5. Test MainWindow instantiation
     print("Testing MainWindow instantiation...")
-    app = MainWindow()
-    app.withdraw()  # Don't show window
+    import tkinterdnd2
+    mainRoot = tkinterdnd2.Tk()
+    mainRoot.withdraw()  # Don't show window
+    app = MainWindow(mainRoot)
     try:
-        app.update()
-        assert app.fileSelector is not None
-        assert app.sheetList is not None
-        assert app.settingsPanel is not None
-        assert app.actionBar is not None
+        mainRoot.update()
+        assert app.queueManager is not None, "queueManager missing"
+        assert app.sheetList is not None, "sheetList missing"
+        assert app.settingsPanel is not None, "settingsPanel missing"
+        assert app.convertAllBtn is not None, "convertAllBtn missing"
+        assert app.dropOverlay is not None, "dropOverlay missing"
         print("[PASS] MainWindow verified successfully.")
     finally:
-        app.update()
+        mainRoot.update()
         app.destroy()
+        mainRoot.destroy()
 
     print("=== ALL UI TESTS PASSED SUCCESSFULLY ===")
 

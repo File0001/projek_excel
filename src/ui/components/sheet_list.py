@@ -18,10 +18,12 @@ class SheetList(ctk.CTkFrame):
         self.onSelectionChanged = onSelectionChanged
         self.sheetItems: List[Dict[str, Any]] = []
         self._buildUi()
+        # Keep the declared height so the sheet area never collapses
+        self.grid_propagate(False)
 
     def _buildUi(self) -> None:
         self.grid_columnconfigure(0, weight=1)
-        self.grid_rowconfigure(2, weight=1)
+        self.grid_rowconfigure(2, weight=1, minsize=180)
 
         # Header
         header = ctk.CTkFrame(self, fg_color="transparent")

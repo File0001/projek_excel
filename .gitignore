@@ -6,16 +6,20 @@ dist/
 output/
 .venv/
 *.spec
+!ExcelToPdfConverter.spec
+src/ui/queue_data.json
 .clineignore
 .clinerules
 .cline/
-installer/ 
-installer.iss
-README-INSTALLER.md
 Transaksi diterima!.eml
-build-installer.bat
-src/.env.example
 Transaksi diterima!.json
+src/.env.example
 .env
 *.env
 src/.env
+
+# Installer build outputs (keep sources: installer/*.iss, build-installer.bat, icon.ico)
+installer/*.exe
+installer/*.bin
+
+installer/CheapNFriendly-ExcelToPdf-Setup-1.0.0.zip

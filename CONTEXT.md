@@ -136,6 +136,33 @@ projek_excel/
   - **Mode Single Merged PDF:** Menampilkan dialog native Windows `asksaveasfilename` dengan nama default terisi (`<baseName>_converted.pdf`), pengguna bebas mengganti nama file & menentukan folder simpan.
   - **Mode Pisah Per-Sheet:** Menampilkan dialog native Windows `askdirectory` untuk memilih folder tujuan seluruh file PDF sheet.
   - **Pembatalan Aman:** Jika pengguna menekan tombol Cancel pada dialog, konversi dibatalkan secara elegan tanpa error.
+- [x] **Unified Single-View Redesign (Batch Queue + Per-File Config):**
+  - **Status:** **DONE** - 2026-10-02
+  - **Motivasi:** Menghapus dua-tab (Single / Batch) yang membingungkan dan menggantinya dengan satu tampilan terpadu yang lebih profesional dan ringkas.
+  - **Fitur:**
+    - **Layout 1 tampilan, 2 kolom:** Kiri = *Antrian File* (daftar file yang bisa diklik), Kanan = *Panel Konfigurasi* per file.
+    - **Per-file config:** Setiap file di antrian punya konfigurasinya sendiri (sheet terpilih, ukuran kertas, orientasi, scaling). Tidak lagi memakai setting global.
+    - **Auto-save on switch:** Saat berpindah file, konfigurasi file sebelumnya otomatis tersimpan ke disk (`queue_data.json`).
+    - **Whole-window drag & drop:** Drop file/folder/ZIP bisa di seluruh area jendela (bukan drop zone terpisah), dengan overlay feedback saat drag-enter.
+    - **Sequential batch convert:** Tombol "Konversi Semua" memproses semua task `pending` satu per satu secara berurutan di worker thread.
+    - **Output ke folder sumber + auto-numbering:** Hasil disimpan di folder asal file (`report_converted.pdf` → `report_converted(1).pdf` → `report_converted(2).pdf`, dst).
+    - **Status warna soft/light:** pending `#EEF2F8`/`#7E8BA4`, processing `#FEF3C7`/`#B45309`, completed `#D1FAE5`/`#15803D`, error `#FEE2E2`/`#DC2626`.
+    - **Styling brand:** Mengikuti `themeColors`/`themeFonts` (Navy/Gold/Crimson), gap konsisten 12–16px, tinggi tombol 32–42px, radius sudut 6–12px.
+  - **Perubahan Model Data (`FileTask`):**
+    - Field baru: `selectedSheets: List[str]`, `paperSize: str`, `orientation: str`, `scaling: str`, `outputPath: Optional[str]`.
+  - **Perubahan `QueueManager`:**
+    - `update_task_config(task_id, config)`: menyimpan config per-file.
+    - Serialisasi/deserialisasi `_save_to_disk` & `_load_from_disk` diperluas untuk field konfigurasi baru.
+  - **Perubahan `SettingsPanel`:**
+    - Method baru `setValues(paperSize, orientation, scaling, outputMode)` untuk memuat nilai saat berpindah file.
+  - **Files baru/update:**
+    - `src/ui/file_task.py`: Field konfigurasi per-file ditambahkan.
+    - `src/ui/queue_manager.py`: `update_task_config()` + serialization diperluas.
+    - `src/ui/main_window.py`: **Ditulis ulang total** — hapus tab & drop zone, daftar file + panel config 2 kolom, overlay drag full-window, auto-save, batch convert, auto-numbering.
+    - `src/ui/components/settings_panel.py`: Tambah `setValues()`.
+    - `tests/test_ui.py`: Disesuaikan dengan API `MainWindow(master)` yang baru (frame-based).
+  - **Testing:** `py_compile` bersih pada semua file; `tests/test_ui.py` **ALL UI TESTS PASSED**; verifikasi live: instantiasi, seleksi file, load sheet, auto-save config, dan auto-numbering output path semuanya OK.
+
 - [ ] Panduan Pengujian Manual & Packaging Executable (Opsional/Next Step).
 
 

@@ -143,3 +143,20 @@ class SettingsPanel(ctk.CTkFrame):
             "scaling": PageScalingEnum(self.scalingVar.get()),
             "outputMode": OutputModeEnum(self.outputModeVar.get()),
         }
+
+    def setValues(
+        self,
+        paperSize: str = None,
+        orientation: str = None,
+        scaling: str = None,
+        outputMode: str = None,
+    ) -> None:
+        """Programmatically set widget values (used when switching files)."""
+        if paperSize is not None:
+            self.paperSizeVar.set(paperSize)
+        if orientation is not None:
+            self.orientationVar.set(orientation)
+        if scaling is not None:
+            self.scalingVar.set(scaling)
+        if outputMode is not None:
+            self.outputModeVar.set(outputMode)
